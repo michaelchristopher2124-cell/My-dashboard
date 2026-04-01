@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Manager Dashboard - The Bay Lounge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Lato:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: #0a0a0a;
+            color: #FFFDD0;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,253,208,0.2);
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid rgba(255,253,208,0.3);
+            color: #FFFDD0;
+            padding: 12px 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 40px;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .tab-btn.active {
+            background: #FFFDD0;
+            color: #000;
+            border-color: #FFFDD0;
+        }
+
+        .tab-btn:hover:not(.active) {
+            border-color: #FFFDD0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,253,208,0.2);
+            padding: 20px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-card h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.7;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .form-card {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,253,208,0.2);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,253,208,0.3);
+            color: #FFFDD0;
+            padding: 12px 15px;
+            font-family: 'Lato', sans-serif;
+            font-size: 1rem;
+            border-radius: 8px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #FFFDD0;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            background: #FFFDD0;
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            font-family: 'Lato', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255,253,208,0.3);
+        }
+
+        .btn-danger {
+            background: transparent;
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .btn-danger:hover {
+            background: #ff6b6b;
+            color: #000;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid #FFFDD0;
+            color: #FFFDD0;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,253,208,0.2);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,253,208,0.1);
+        }
+
+        th {
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        .menu-image-preview {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #FFFDD0;
+        }
+
+        .event-image-preview {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid rgba(255,253,208,0.3);
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .edit-btn, .delete-btn {
+            padding: 5px 12px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+
+        .edit-btn {
+            background: #FFFDD0;
+            color: #000;
+            border: none;
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        .upload-section {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255,253,208,0.05);
+            border-radius: 8px;
+            border: 1px dashed rgba(255,253,208,0.3);
+        }
+
+        .image-preview {
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .preview-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #FFFDD0;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .preview-rectangle {
+            width: 120px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #FFFDD0;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .type-selector {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(255,253,208,0.05);
+            border-radius: 12px;
+        }
+
+        .type-option {
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            padding: 15px;
+            border: 2px solid rgba(255,253,208,0.3);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .type-option.selected {
+            border-color: #FFFDD0;
+            background: rgba(255,253,208,0.1);
+        }
+
+        .type-option .icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .success-msg, .error-msg {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 350px;
+        }
+
+        .success-msg {
+            background: rgba(76, 175, 80, 0.95);
+            border: 1px solid #4caf50;
+            color: white;
+        }
+
+        .error-msg {
+            background: rgba(255, 107, 107, 0.95);
+            border: 1px solid #ff6b6b;
+            color: white;
+        }
+
+        .compress-info {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 8px;
+            color: #4caf50;
+        }
+
+        .url-info {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 5px;
+            color: #FFD700;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 15px 0;
+            position: relative;
+            color: rgba(255,253,208,0.5);
+            font-size: 0.8rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: rgba(255,253,208,0.3);
+        }
+
+        .divider::before {
+            left: 0;
+        }
+
+        .divider::after {
+            right: 0;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .tabs {
+                flex-direction: column;
+            }
+            .tab-btn {
+                text-align: center;
+            }
+            .type-selector {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>🎛️ Manager Dashboard</h1>
+            <p>The Bay Lounge - Content Management System | Upload images OR paste URLs</p>
+        </div>
+
+        <div id="successMsg" class="success-msg"></div>
+        <div id="errorMsg" class="error-msg"></div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('menu')">🍽️ Menu Items</button>
+            <button class="tab-btn" onclick="switchTab('events')">🎉 Events</button>
+            <button class="tab-btn" onclick="switchTab('add')">➕ Add New Item</button>
+        </div>
+
+        <!-- Menu Management Tab -->
+        <div id="menu-tab" class="tab-content active">
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>Total Menu Items</h3>
+                    <div class="number" id="totalMenuItems">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Categories</h3>
+                    <div class="number" id="totalCategories">0</div>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Image</th><th>Name</th><th>Category</th><th>Price (₦)</th><th>Description</th><th>Actions</th>
+                    </thead>
+                    <tbody id="menu-table-body">
+                        <tr><td colspan="6" style="text-align:center">Loading menu items...</td</tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Events Management Tab -->
+        <div id="events-tab" class="tab-content">
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>Total Events</h3>
+                    <div class="number" id="totalEvents">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Events</h3>
+                    <div class="number" id="activeEvents">0</div>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr><th>Banner</th><th>Event Name</th><th>Date</th><th>Standard (₦)</th><th>VIP (₦)</th><th>VVIP (₦)</th><th>Status</th><th>Actions</th>
+                    </thead>
+                    <tbody id="events-table-body">
+                        <tr><td colspan="8" style="text-align:center">Loading events...</td</tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Add New Item Tab -->
+        <div id="add-tab" class="tab-content">
+            <div class="form-card">
+                <h2>📋 Upload New Item</h2>
+                
+                <div class="type-selector">
+                    <div id="select-menu" class="type-option selected" onclick="selectType('menu')">
+                        <div class="icon">🍽️</div>
+                        <div>Upload to Menu</div>
+                        <div style="font-size:0.7rem; opacity:0.7;">Food & Drinks</div>
+                    </div>
+                    <div id="select-event" class="type-option" onclick="selectType('event')">
+                        <div class="icon">🎉</div>
+                        <div>Upload to Events</div>
+                        <div style="font-size:0.7rem; opacity:0.7;">Upcoming Events</div>
+                    </div>
+                </div>
+
+                <!-- Menu Form -->
+                <div id="menu-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Item Name *</label>
+                            <input type="text" id="item-name" placeholder="e.g., Grilled Salmon">
+                        </div>
+                        <div class="form-group">
+                            <label>Category *</label>
+                            <select id="item-category">
+                                <option value="Appetizers">Appetizers</option>
+                                <option value="Main Course">Main Course</option>
+                                <option value="Desserts">Desserts</option>
+                                <option value="Drinks">Drinks</option>
+                                <option value="Cocktails">Cocktails</option>
+                                <option value="Wine">Wine</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Price (₦) *</label>
+                            <input type="number" id="item-price" placeholder="e.g., 15000">
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <input type="text" id="item-description" placeholder="Brief description">
+                        </div>
+                    </div>
+                    
+                    <div class="divider">📷 OPTION 1: UPLOAD IMAGE FILE</div>
+                    
+                    <div class="form-group">
+                        <label>Upload Image (Auto Compressed)</label>
+                        <div class="upload-section">
+                            <input type="file" id="menu-image-upload" accept="image/*" style="display:none">
+                            <button type="button" class="btn-secondary" onclick="document.getElementById('menu-image-upload').click()">📷 Choose Image File</button>
+                            <div class="image-preview" id="menu-image-preview" style="display:none">
+                                <img id="menu-preview-img" class="preview-circle" alt="Preview">
+                                <button type="button" class="delete-btn" style="padding:5px 10px" onclick="clearMenuImage()">Remove</button>
+                            </div>
+                            <div class="compress-info">✅ Images auto-compressed to 300x300px (under 100KB)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="divider">🔗 OPTION 2: PASTE IMAGE URL</div>
+                    
+                    <div class="form-group">
+                        <label>OR Paste Image URL</label>
+                        <input type="text" id="menu-image-url" placeholder="https://your-image-url.jpg">
+                        <div class="url-info">💡 Use this for Cloudinary, Imgur, or any image hosting URL</div>
+                    </div>
+                </div>
+
+                <!-- Event Form -->
+                <div id="event-form" style="display:none">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Event Name *</label>
+                            <input type="text" id="event-name" placeholder="e.g., Buffet Brunch">
+                        </div>
+                        <div class="form-group">
+                            <label>Event Date *</label>
+                            <input type="text" id="event-date" placeholder="e.g., Easter Sunday, April 20, 2025">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description *</label>
+                        <textarea id="event-description" rows="2" placeholder="Event description..."></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Standard Ticket (₦)</label>
+                            <input type="number" id="event-t1" placeholder="e.g., 15000">
+                        </div>
+                        <div class="form-group">
+                            <label>VIP Ticket (₦)</label>
+                            <input type="number" id="event-t2" placeholder="e.g., 38000">
+                        </div>
+                        <div class="form-group">
+                            <label>VVIP Ticket (₦)</label>
+                            <input type="number" id="event-t3" placeholder="e.g., 70000">
+                        </div>
+                    </div>
+                    
+                    <div class="divider">📷 OPTION 1: UPLOAD BANNER</div>
+                    
+                    <div class="form-group">
+                        <label>Upload Banner (Auto Compressed)</label>
+                        <div class="upload-section">
+                            <input type="file" id="event-image-upload" accept="image/*" style="display:none">
+                            <button type="button" class="btn-secondary" onclick="document.getElementById('event-image-upload').click()">📷 Choose Banner File</button>
+                            <div class="image-preview" id="event-image-preview" style="display:none">
+                                <img id="event-preview-img" class="preview-rectangle" alt="Preview">
+                                <button type="button" class="delete-btn" style="padding:5px 10px" onclick="clearEventImage()">Remove</button>
+                            </div>
+                            <div class="compress-info">✅ Banners auto-compressed to 800x400px (under 150KB)</div>
+                        </div>
+                    </div>
+                    
+                    <div class="divider">🔗 OPTION 2: PASTE BANNER URL</div>
+                    
+                    <div class="form-group">
+                        <label>OR Paste Banner URL</label>
+                        <input type="text" id="event-image-url" placeholder="https://your-banner-url.jpg">
+                        <div class="url-info">💡 Paste your Cloudinary, Imgur, or any image hosting URL</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="event-status">
+                            <option value="active">Active</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="submitToSheetDB()" style="margin-top:20px">✅ Upload to SheetDB</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SHEETDB_API = 'https://sheetdb.io/api/v1/r2929i5jjlyqm';
+        let currentType = 'menu';
+        let menuImageData = null;
+        let eventImageData = null;
+
+        // IMAGE COMPRESSION FUNCTION
+        function compressImage(file, maxWidth, maxHeight, quality, callback) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > maxWidth) {
+                        height = (height * maxWidth) / width;
+                        width = maxWidth;
+                    }
+                    if (height > maxHeight) {
+                        width = (width * maxHeight) / height;
+                        height = maxHeight;
+                    }
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                    callback(compressedBase64);
+                };
+            };
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMenuItems();
+            loadEvents();
+            
+            // Menu image upload with compression
+            document.getElementById('menu-image-upload').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                showMessage('Compressing image...', 'success');
+                compressImage(file, 300, 300, 0.7, (compressed) => {
+                    menuImageData = compressed;
+                    document.getElementById('menu-preview-img').src = compressed;
+                    document.getElementById('menu-image-preview').style.display = 'flex';
+                    showMessage('Image compressed and ready!', 'success');
+                });
+            });
+            
+            // Event image upload with compression
+            document.getElementById('event-image-upload').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                showMessage('Compressing banner...', 'success');
+                compressImage(file, 800, 400, 0.6, (compressed) => {
+                    eventImageData = compressed;
+                    document.getElementById('event-preview-img').src = compressed;
+                    document.getElementById('event-image-preview').style.display = 'flex';
+                    showMessage('Banner compressed and ready!', 'success');
+                });
+            });
+        });
+
+        function clearMenuImage() {
+            menuImageData = null;
+            document.getElementById('menu-image-preview').style.display = 'none';
+            document.getElementById('menu-image-upload').value = '';
+            document.getElementById('menu-image-url').value = '';
+        }
+
+        function clearEventImage() {
+            eventImageData = null;
+            document.getElementById('event-image-preview').style.display = 'none';
+            document.getElementById('event-image-upload').value = '';
+            document.getElementById('event-image-url').value = '';
+        }
+
+        function selectType(type) {
+            currentType = type;
+            document.getElementById('select-menu').classList.toggle('selected', type === 'menu');
+            document.getElementById('select-event').classList.toggle('selected', type === 'event');
+            document.getElementById('menu-form').style.display = type === 'menu' ? 'block' : 'none';
+            document.getElementById('event-form').style.display = type === 'event' ? 'block' : 'none';
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`${tab}-tab`).classList.add('active');
+            event.target.classList.add('active');
+            if (tab === 'menu') loadMenuItems();
+            if (tab === 'events') loadEvents();
+        }
+
+        async function loadMenuItems() {
+            try {
+                const response = await fetch(SHEETDB_API);
+                const data = await response.json();
+                const menuItems = data.filter(item => item.type === 'menu');
+                document.getElementById('totalMenuItems').textContent = menuItems.length;
+                const categories = [...new Set(menuItems.map(i => i.category).filter(c => c))];
+                document.getElementById('totalCategories').textContent = categories.length;
+                
+                const tbody = document.getElementById('menu-table-body');
+                if (menuItems.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">No menu items found</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = menuItems.map((item) => `
+                    <tr>
+                        <td><img src="${item.image_url || 'https://via.placeholder.com/50?text=No+Image'}" class="menu-image-preview" onerror="this.src='https://via.placeholder.com/50?text=No+Image'"></td>
+                        <td><strong>${escapeHtml(item.name)}</strong></td>
+                        <td>${escapeHtml(item.category) || 'Other'}</td>
+                        <td>₦${parseInt(item.price).toLocaleString()}</td>
+                        <td>${escapeHtml(item.description) || '-'}</td>
+                        <td><button class="delete-btn" onclick="deleteItem('${escapeHtml(item.name)}', 'menu')">🗑️ Delete</button></td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function loadEvents() {
+            try {
+                const response = await fetch(SHEETDB_API);
+                const data = await response.json();
+                const events = data.filter(item => item.type === 'event');
+                document.getElementById('totalEvents').textContent = events.length;
+                document.getElementById('activeEvents').textContent = events.filter(e => e.status !== 'cancelled').length;
+                
+                const tbody = document.getElementById('events-table-body');
+                if (events.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center">No events found</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = events.map(event => `
+                    <tr>
+                        <td><img src="${event.flyer_image || 'https://via.placeholder.com/80?text=No+Banner'}" class="event-image-preview" onerror="this.src='https://via.placeholder.com/80?text=No+Banner'"></td>
+                        <td><strong>${escapeHtml(event.name)}</strong></td>
+                        <td>${escapeHtml(event.date) || 'TBD'}</td>
+                        <td>₦${parseInt(event.t1 || 0).toLocaleString()}</td>
+                        <td>₦${parseInt(event.t2 || 0).toLocaleString()}</td>
+                        <td>₦${parseInt(event.t3 || 0).toLocaleString()}</td>
+                        <td><span style="color: ${event.status === 'cancelled' ? '#ff6b6b' : '#4caf50'}">${event.status || 'active'}</span></td>
+                        <td><button class="delete-btn" onclick="deleteItem('${escapeHtml(event.name)}', 'event')">🗑️ Delete</button></td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function submitToSheetDB() {
+            if (currentType === 'menu') {
+                const name = document.getElementById('item-name').value.trim();
+                const category = document.getElementById('item-category').value;
+                const price = document.getElementById('item-price').value;
+                const description = document.getElementById('item-description').value;
+                const imageUrlInput = document.getElementById('menu-image-url').value.trim();
+                
+                if (!name || !price) {
+                    showMessage('Please fill in Name and Price', 'error');
+                    return;
+                }
+                
+                // Prioritize uploaded image, then URL, then empty
+                let finalImage = '';
+                if (menuImageData) {
+                    finalImage = menuImageData;
+                } else if (imageUrlInput) {
+                    finalImage = imageUrlInput;
+                }
+                
+                const newItem = {
+                    type: 'menu',
+                    name: name,
+                    category: category,
+                    price: parseInt(price),
+                    description: description || '',
+                    image_url: finalImage,
+                    status: 'active'
+                };
+                
+                try {
+                    showMessage('Uploading to SheetDB...', 'success');
+                    const response = await fetch(SHEETDB_API, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newItem)
+                    });
+                    
+                    if (response.ok) {
+                        showMessage(`✅ "${name}" added to menu successfully!`, 'success');
+                        clearMenuForm();
+                        loadMenuItems();
+                    } else {
+                        const error = await response.text();
+                        showMessage('Error: ' + error.substring(0, 200), 'error');
+                    }
+                } catch (error) {
+                    showMessage('Error: ' + error.message, 'error');
+                }
+            } else {
+                const name = document.getElementById('event-name').value.trim();
+                const date = document.getElementById('event-date').value;
+                const description = document.getElementById('event-description').value;
+                const t1 = document.getElementById('event-t1').value;
+                const t2 = document.getElementById('event-t2').value;
+                const t3 = document.getElementById('event-t3').value;
+                const status = document.getElementById('event-status').value;
+                const imageUrlInput = document.getElementById('event-image-url').value.trim();
+                
+                if (!name || !description) {
+                    showMessage('Please fill in Event Name and Description', 'error');
+                    return;
+                }
+                
+                // Prioritize uploaded image, then URL, then empty
+                let finalImage = '';
+                if (eventImageData) {
+                    finalImage = eventImageData;
+                } else if (imageUrlInput) {
+                    finalImage = imageUrlInput;
+                }
+                
+                const newEvent = {
+                    type: 'event',
+                    name: name,
+                    date: date || '',
+                    description: description,
+                    t1: parseInt(t1) || 0,
+                    t2: parseInt(t2) || 0,
+                    t3: parseInt(t3) || 0,
+                    flyer_image: finalImage,
+                    status: status
+                };
+                
+                try {
+                    showMessage('Uploading to SheetDB...', 'success');
+                    const response = await fetch(SHEETDB_API, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newEvent)
+                    });
+                    
+                    if (response.ok) {
+                        showMessage(`✅ "${name}" added to events successfully!`, 'success');
+                        clearEventForm();
+                        loadEvents();
+                    } else {
+                        const error = await response.text();
+                        showMessage('Error: ' + error.substring(0, 200), 'error');
+                    }
+                } catch (error) {
+                    showMessage('Error: ' + error.message, 'error');
+                }
+            }
+        }
+
+        async function deleteItem(name, type) {
+            if (!confirm(`Are you sure you want to delete "${name}"?`)) return;
+            try {
+                const response = await fetch(SHEETDB_API);
+                const data = await response.json();
+                const itemToDelete = data.find(item => item.type === type && item.name === name);
+                if (itemToDelete && itemToDelete.id) {
+                    await fetch(`${SHEETDB_API}/id/${itemToDelete.id}`, { method: 'DELETE' });
+                } else {
+                    await fetch(`${SHEETDB_API}/name/${encodeURIComponent(name)}`, { method: 'DELETE' });
+                }
+                showMessage(`✅ "${name}" deleted successfully`, 'success');
+                if (type === 'menu') loadMenuItems();
+                else loadEvents();
+            } catch (error) {
+                showMessage('Error deleting item', 'error');
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function showMessage(msg, type) {
+            const el = document.getElementById(`${type === 'success' ? 'successMsg' : 'errorMsg'}`);
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 4000);
+        }
+
+        function clearMenuForm() {
+            document.getElementById('item-name').value = '';
+            document.getElementById('item-price').value = '';
+            document.getElementById('item-description').value = '';
+            document.getElementById('menu-image-url').value = '';
+            clearMenuImage();
+        }
+
+        function clearEventForm() {
+            document.getElementById('event-name').value = '';
+            document.getElementById('event-date').value = '';
+            document.getElementById('event-description').value = '';
+            document.getElementById('event-t1').value = '';
+            document.getElementById('event-t2').value = '';
+            document.getElementById('event-t3').value = '';
+            document.getElementById('event-image-url').value = '';
+            clearEventImage();
+        }
+    </script>
+</body>
+</html>
